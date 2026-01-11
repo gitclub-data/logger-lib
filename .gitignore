@@ -1,0 +1,8 @@
+# Testing senario files (LATER DELETE IT)
+# testing.txt
+
+
+# Dependency folder
+**/__pycache__/
+
+#remaining logger and logmessage decorator

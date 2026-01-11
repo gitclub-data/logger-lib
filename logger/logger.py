@@ -67,7 +67,7 @@ class Logger:
                 # include the loglevel in the log
                 if loggerinstance.__includeloglevel:
                     if level==None:
-                        raise LoggerException('Set includeLogLevel to false, or include the log level in log message.')
+                        raise LoggerException("Set includeLogLevel to false, or include the log level in log message.")
                     loggerjson[LogConstants.LOG_LEVEL] = level.value
                 # include the function name in the log
                 if loggerinstance.__includefunctionname:
