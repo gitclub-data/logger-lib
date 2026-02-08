@@ -24,7 +24,7 @@ class Logger:
     control which metadata is included in each log message.
 
     Attributes:
-        __instance (Logger | None):
+        _instance (Logger | None):
             Private singleton instance of the Logger.
 
         __lock (threading.Lock):
@@ -38,15 +38,15 @@ class Logger:
             Strategy responsible for writing log messages and determining
             their destination.
 
-        _isLoggerEnabled (bool):
+        _isfunctionlevel_enable (dict):
             Controls whether logging is enabled for the current function or
             execution context.
 
         _isGlobalLoggerEnabled (bool):
             Controls whether logging is enabled globally across the application.
 
-        _funcName (str | None):
-            Name of the function for which the log message is being generated.
+        _thread_functionname (dict):
+            current function thread id and attached functionname with it.
 
         __includeFunctionName (bool):
             Global flag indicating whether function names should be included
@@ -58,7 +58,7 @@ class Logger:
     """
 
     # singleton instance
-    __instance : Logger|None = None
+    _instance : Logger|None = None
 
     # thread safe lock
     __lock : threading.Lock = threading.Lock()
@@ -69,47 +69,36 @@ class Logger:
     # write logs strategy
     __writeLoggerStrategy : WriteLogMessage|None = None
 
-    # enable-disable logger
-    _isloggerenable: bool = False
+    # thread-level-function-name
+    _thread_functionname : dict = {} # threadid : functionid
+
+    # function-level logger
+    _isfunctionlevel_enable : dict = {} # function_entry : enable_disable
 
     # logger enable globally
     _isgloballoggerenable : bool = True
 
-    #function name for which logger is called
-    _funcname: str|None = None
-    
     # include log level and function parameter
     __includefunctionname = True
     __includeloglevel = True
 
     # get logger instance
-    def __new__(cls, writeLoggerStrategy :WriteLogMessage , loggerDecorator: LoggerMessageDecorator = SimpleLogger(), includefunctionname : bool = True, includeloglevel : bool = True, isgloballoggerenable: bool = True) -> Self:
-        if cls.__instance==None:
+    def __new__(cls, writeLoggerStrategy :WriteLogMessage, loggerDecorator: LoggerMessageDecorator = SimpleLogger(), 
+                includefunctionname : bool = True, 
+                includeloglevel : bool = True, isgloballoggerenable: bool = True) -> Self:
+        if cls._instance==None:
             with cls.__lock:
-                if cls.__instance==None:
-                    cls.__instance = super().__new__(cls)
+                if cls._instance==None:
+                    cls._instance = super().__new__(cls)
                     cls.__loggerMessageDecorator = loggerDecorator
                     cls.__includefunctionname = includefunctionname
                     cls.__includeloglevel = includeloglevel
                     cls.__writeLoggerStrategy = writeLoggerStrategy
                     cls._isgloballoggerenable = isgloballoggerenable
-                    if cls._isgloballoggerenable:
-                        cls._isloggerenable = True
-        return cast(Self, cls.__instance)
+        return cast(Self, cls._instance)     
 
     @classmethod
-    def _setUpDefaultValues(cls):
-        cls.__instance = None
-        cls.__loggerMessageDecorator = SimpleLogger()
-        cls.__writeLoggerStrategy = None
-        cls._isloggerenable = False
-        cls._isgloballoggerenable = True
-        cls._funcname = None
-        cls.__includefunctionname = True
-        cls.__includeloglevel = True
-
-    @staticmethod
-    def log(msg: str, level: LoglevelEnum | None = None):
+    def log(cls, msg: str, level: LoglevelEnum | None = None):
         """
             Logs a message with the specified log level.
 
@@ -126,34 +115,54 @@ class Logger:
                 level (LogLevelEnum):
                     The severity level of the log message.
         """
-        # get logger instance
-        loggerinstance = Logger.__instance
+        loggerinstance = cls._instance
+        
+        thread_id = threading.get_ident()
         # check if it is none if yes then raise Exception
         if loggerinstance==None:
             raise LoggerException(LoggerExceptionMessageConstant.LOGGER_INSTANTIATION_EXCEPTION)
+        
         # see if logger decorator is passed or not if instance is intialized then it is passed for sure
-        if loggerinstance.__loggerMessageDecorator:
-            # see if is logger enabled or not
-            if loggerinstance._isloggerenable:
-                # create a json object for getting logging details
-                loggerjson : dict[str, str] = {}
-                loggerjson[LogConstants.LOG_MESSAGE] = msg
-                # include the loglevel in the log
-                if loggerinstance.__includeloglevel:
-                    if level==None:
-                        raise LoggerException(LoggerExceptionMessageConstant.LOGGER_INCLUDE_LOG_LEVEL_EXCEPTION)
-                    loggerjson[LogConstants.LOG_LEVEL] = level.value
-                # include the function name in the log
-                if loggerinstance.__includefunctionname:
-                    if loggerinstance._funcname==None:
-                        raise LoggerException(LoggerExceptionMessageConstant.LOGGER_INCLUDE_LOG_FUNCTION_NAME_EXCEPTION)
-                    loggerjson[LogConstants.LOG_FUNCTION_NAME] = loggerinstance._funcname
-                # send it logger decorator
-                loggerjson = loggerinstance.__loggerMessageDecorator.getLog(loggerjson=loggerjson)
-                #write the log
-                if loggerinstance.__writeLoggerStrategy==None:
-                    raise LoggerException(LoggerExceptionMessageConstant.WRITING_LOG_STRATEGY_NOT_PROVIDED_EXCEPTION)
-                loggerinstance.__writeLoggerStrategy.writelog(loggerjson)
+        if cls.__loggerMessageDecorator:
+
+            # check if global logger enabled or not
+            if cls._isgloballoggerenable:
+            
+                # get the function id
+                if thread_id not in cls._thread_functionname:
+                    raise LoggerException(LoggerExceptionMessageConstant.LOGGER_DECORATOR_REQUIRED)
+                functionid = cls._thread_functionname[thread_id]
+                
+                # checking if function id is present to tell the function level logger enabled or not
+                if functionid not in cls._isfunctionlevel_enable:
+                    raise LoggerException(LoggerExceptionMessageConstant.LOGGER_FUNCTION_ID_IS_MISSING)
+                
+                # checking if function level log is enabled or not
+                if cls._isfunctionlevel_enable[functionid]:    
+                    # create a json object for getting logging details
+                    loggerjson : dict[str, str] = {}
+                    loggerjson[LogConstants.LOG_MESSAGE] = msg
+                    
+                    # include the loglevel in the log
+                    if cls.__includeloglevel:
+                        if level==None:
+                            raise LoggerException(LoggerExceptionMessageConstant.LOGGER_INCLUDE_LOG_LEVEL_EXCEPTION)
+                        loggerjson[LogConstants.LOG_LEVEL] = level.value
+                    
+                    # include the function name in the log
+                    if cls.__includefunctionname:
+                        if thread_id not in cls._thread_functionname:
+                            raise LoggerException(LoggerExceptionMessageConstant.LOGGER_INCLUDE_LOG_FUNCTION_NAME_EXCEPTION)
+                        loggerjson[LogConstants.LOG_FUNCTION_NAME] = functionid
+                    
+                    # send it logger decorator
+                    loggerjson = cls.__loggerMessageDecorator.getLog(loggerjson=loggerjson)
+                    
+                    #write the log
+                    if cls.__writeLoggerStrategy==None:
+                        raise LoggerException(LoggerExceptionMessageConstant.WRITING_LOG_STRATEGY_NOT_PROVIDED_EXCEPTION)
+                    
+                    cls.__writeLoggerStrategy.writelog(loggerjson)
 
 # test it
 # implement docker strategy

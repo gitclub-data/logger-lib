@@ -1,5 +1,5 @@
 from typing import Protocol
-from datetime import datetime, timezone
+from datetime import datetime, timezone, tzinfo
 from typing import override
 
 from .logConstants import LogConstants
@@ -84,7 +84,7 @@ class LoggerWithTimeStamp(LoggerMessageDecorator):
                 the user's desired local time.
     """
 
-    def __init__(self, localtimezone : timezone = timezone.utc, additionallogger: LoggerMessageDecorator|None = None) -> None:
+    def __init__(self, localtimezone : tzinfo = timezone.utc, additionallogger: LoggerMessageDecorator|None = None) -> None:
         super().__init__()
         self.__additionallogger : LoggerMessageDecorator|None = additionallogger
         self.__localtimezone = localtimezone

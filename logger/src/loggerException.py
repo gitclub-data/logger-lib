@@ -17,7 +17,9 @@ class LoggerExceptionMessageConstant:
     """
     LOGGER_INSTANTIATION_EXCEPTION: Final = "Logger has not been initialized. Call initLogger() before using it."
     LOGGER_INCLUDE_LOG_LEVEL_EXCEPTION: Final = "Set includeLogLevel to false, or include the log level in log message."
-    LOGGER_INCLUDE_LOG_FUNCTION_NAME_EXCEPTION: Final = "funcName is required. Please provide a valid function name."
+    LOGGER_INCLUDE_LOG_FUNCTION_NAME_EXCEPTION: Final = "funcName is required. Please attach a valid function name."
     WRITING_LOG_STRATEGY_NOT_PROVIDED_EXCEPTION: Final = "writeLoggerStrategy must not be None. Please provide a valid log writing strategy."
+    LOGGER_FUNCTION_ID_IS_MISSING : Final = "functionid must be needed to determine if the function is enabled or disabled for logging."
+    LOGGER_DECORATOR_REQUIRED : Final = "gaurav logger Decorator is required to attach to use the log function."
 
 

@@ -1,7 +1,16 @@
 from typing import Callable, Any
+import inspect
+import threading
 
 # logger import
 from .logger import Logger
+from .loggerException import LoggerException, LoggerExceptionMessageConstant
+
+def function_uid(func):
+    func = inspect.unwrap(func)
+    if hasattr(func, "__func__"):  # bound method
+        func = func.__func__
+    return f"{func.__module__}.{func.__qualname__}"
 
 def gaurav_logger(enable: bool = True) -> Callable:  
     """
@@ -38,9 +47,28 @@ def gaurav_logger(enable: bool = True) -> Callable:
                 Returns:
                     Any: The result of executing the target function.
             """
+
+            # check logger is even initialized or not
+            if Logger._instance==None:
+                raise LoggerException(LoggerExceptionMessageConstant.LOGGER_INSTANTIATION_EXCEPTION)
+            
+            thread_id = threading.get_ident()
+            functionid = function_uid(function)
             if Logger._isgloballoggerenable:
-                Logger._isloggerenable = enable
-            Logger._funcname = function.__name__
-            return function(*args, **kwargs)
+                # adding threadid and attaching this function
+                Logger._thread_functionname[thread_id] = functionid
+
+                # attaching if function level is enabled for logging or not
+                if functionid not in Logger._isfunctionlevel_enable:
+                    Logger._isfunctionlevel_enable[functionid] = enable
+                                
+            result = function(*args, **kwargs)
+            
+            # cleanup tasks
+            if Logger._isgloballoggerenable:
+                # removing threadid by which this function is attached
+                Logger._thread_functionname.pop(thread_id)
+
+            return result
         return wrapper            
     return decorator

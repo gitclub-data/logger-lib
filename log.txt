@@ -1,0 +1,16 @@
+__main__.func1 || DEBUG || before writing message
+__main__.func1 || DEBUG || after writing message
+Service1 || __main__.func1 || 2026-02-03 10:01:45.634442+00:00 || DEBUG || before writing message
+Service1 || __main__.func1 || 2026-02-03 10:01:45.637288+00:00 || DEBUG || after writing message
+Service1 || __main__.func1 || 2026-02-03 10:29:15.639662+00:00 || before writing message
+Service1 || __main__.func1 || 2026-02-03 10:29:15.642931+00:00 || after writing message
+Service1 || __main__.func1 || 2026-02-03 10:30:05.226676+00:00 || before writing message
+Service1 || __main__.func1 || 2026-02-03 10:30:05.228389+00:00 || after writing message
+Service1 || 2026-02-03 10:30:09.066961+00:00 || before writing message
+Service1 || 2026-02-03 10:30:09.069740+00:00 || after writing message
+Service1 || 2026-02-03 10:37:55.334876+00:00 || before writing message
+Service1 || 2026-02-03 10:37:55.337477+00:00 || after writing message
+Service1 || __main__.func1 || 2026-02-03 16:10:40.760879+05:30 || DEBUG || before writing message
+Service1 || __main__.func1 || 2026-02-03 16:10:40.763207+05:30 || DEBUG || after writing message
+Service1 || __main__.func1 || 2026-02-03 16:12:49.341893+05:30 || DEBUG || before writing message
+Service1 || __main__.func1 || 2026-02-03 16:12:49.344230+05:30 || DEBUG || after writing message

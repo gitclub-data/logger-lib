@@ -1,10 +1,11 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "logger-lib"
 version = "0.1.0"
-description = "Plug and play logging module"
-authors = [{ name = "Gaurav Pandey" }]
-dependencies = []
+description = "Plug and play logging module with rich functionalities"
+authors = [{ name = "Gaurav Pandey", email = "gauravpandey1207@gmail.com" }]
+dependencies = ["typing-extensions>=4.0.0","tzdata>=2023.3"]
+requires-python = ">=3.7"
+
+# Move the long_description fields here
+[tool.setuptools]
+packages = ["logger"]

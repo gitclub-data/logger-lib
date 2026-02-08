@@ -1,0 +1,20 @@
+# Simplest Hello World Examples for testing a logger 
+
+# create a simple sync filewriter and injected into logger to tell where to write the logs
+# and then use logger to do the logging process. and multiple data using decorators
+
+from logger import Logger
+from logger import *
+
+logMessanger : WriteLogMessage = FileWriterLog("log.txt")
+logdecorator : LoggerMessageDecorator = SimpleLogger(LoggerWithTimeStamp(additionallogger=LoggerWithServiceName(serviceName="Service1")))
+logger = Logger(logMessanger, loggerDecorator=logdecorator)
+
+# logger false so that it will not work for this particular function
+@gaurav_logger(enable=False)
+def func1(msg: str):
+    Logger.log("before writing message", LoglevelEnum.DEBUG)
+    print(msg)
+    Logger.log("after writing message", LoglevelEnum.DEBUG)
+
+func1("hello World")

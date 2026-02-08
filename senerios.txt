@@ -1,0 +1,34 @@
+Integration Test
+-----------------
+create 5 apis which calls different function and put different kinds of logs through it.
+
+call the apis and check for thread safty for sync, async and deque
+with 5
+with 10 
+with 15
+with 20
+with 25
+with 30
+with 35
+with 40
+with 45
+with 50
+with 100
+with 300
+with 500
+with 700
+with 900
+with 1000
+
+check if all the logs are coming into the file and fix any issues
+check if order of the logs is same as called apis or not by timestamp
+keep it in a report file()
+
+---------------------------------------------------------------------------------------------------
+Performance & Load Testing
+--------------------------
+
+
+
+
+
