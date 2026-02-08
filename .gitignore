@@ -12,6 +12,7 @@ myenv
 log.txt
 
 # wheel files during development and production phase
+build
 dist
 logger_lib.egg-info
 
