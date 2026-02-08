@@ -5,9 +5,16 @@
 # Dependency folder
 **/__pycache__/
 
-#remaining logger and logmessage decorator
-# docstring
-# unit testing
+# virtual envrionment
+myenv
+
+# log data created during testing
+log.txt
+
+# wheel files during development and production phase
+dist
+logger_lib.egg-info
+
 # Integeration testing
 # readme
 # all types of load, performamce, stress testing and add that in the readme
